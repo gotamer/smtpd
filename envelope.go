@@ -2,6 +2,7 @@ package smtpd
 
 import (
 	"crypto/tls"
+	"bytes"
 	"fmt"
 	"strings"
 	"time"
@@ -51,4 +52,15 @@ func (env *Envelope) AddReceivedLine(peer Peer) {
 	copy(env.Data[len(line):], env.Data[0:len(env.Data)-len(line)])
 	copy(env.Data, line)
 
+}
+
+
+// AddHeaderLine prepends a Header to the massage
+func (env *Envelope) AddHeaderLine(key, value []byte) {
+	value = bytes.TrimSpace(value)
+	line := append(key, []byte(": ")...)
+	line = append(line, value...)
+	line = wrap(line)
+	line = append(line, cr...)
+	env.Data = append(line, env.Data...)
 }
